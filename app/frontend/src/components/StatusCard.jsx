@@ -1,4 +1,4 @@
-﻿function StatusCard({ title, loading, error, data }) {
+function StatusCard({ title, loading, error, data }) {
   return (
     <section className="status-card">
       <header className="status-card__header">

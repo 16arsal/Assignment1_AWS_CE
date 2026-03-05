@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchHealth, fetchHello, fetchReady, getApiBaseUrl } from "./api/client";
 import StatusCard from "./components/StatusCard";
 import "./App.css";

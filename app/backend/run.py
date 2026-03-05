@@ -1,6 +1,6 @@
-﻿from app import create_app
+from app import create_app
 
-# Exposes `app` for future Gunicorn usage: `gunicorn run:app`
+# Exposes `app` for Gunicorn: `gunicorn -w 4 -b 0.0.0.0:5000 run:app`
 app = create_app()
 
 

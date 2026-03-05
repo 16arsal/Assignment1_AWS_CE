@@ -1,10 +1,10 @@
 ﻿# Assignment 1 - AWS Cloud Engineering Full-Stack App
 
 This project is a production-style Flask + React application scaffold prepared for AWS EC2 deployment.
-It is structured for maintainability, health checks, readiness checks, and easy migration to Gunicorn later.
+It is structured for maintainability, health checks, readiness checks, and Gunicorn-based production serving.
 
 ## Tech Stack
-- Backend: Flask, Flask-CORS
+- Backend: Flask, Flask-CORS, Gunicorn
 - Frontend: Vite + React
 - Deployment target: AWS EC2 behind ALB (no Docker)
 
@@ -20,7 +20,7 @@ Assignment1_AWS_CE/
 |   |   |-- .env.example
 |   |   |-- .gitignore
 |   |   |-- requirements.txt
-|   |   `-- run.py               # Entrypoint (also exposes app for future Gunicorn)
+|   |   `-- run.py               # Entrypoint + Gunicorn WSGI app export
 |   `-- frontend/
 |       |-- src/
 |       |   |-- api/
@@ -72,7 +72,7 @@ Base URL (local): `http://localhost:5000`
 ### Frontend (`app/frontend/.env.example`)
 - `VITE_API_BASE_URL=http://localhost:5000`
 
-## Local Run Instructions
+## Local Dev Run Instructions
 ### 1) Run backend
 ```powershell
 cd app/backend
@@ -91,14 +91,24 @@ npm run dev
 
 Frontend default URL: `http://localhost:5173`
 
+## Production Run Instructions (EC2)
+From `app/backend`:
+
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+gunicorn -w 4 -b 0.0.0.0:5000 run:app
+```
+
 ## AWS EC2 Deployment Readiness Notes
 - Backend binds to `0.0.0.0` and configurable `PORT` for EC2 runtime compatibility.
 - App factory pattern keeps initialization clean and testable for cloud deployments.
 - Health and readiness endpoints are ready for ALB target group checks.
-- `run.py` exposes `app`, so switching to Gunicorn later is straightforward:
-  - `gunicorn run:app --bind 0.0.0.0:5000`
+- `run.py` exposes `app` directly for Gunicorn:
+  - `gunicorn -w 4 -b 0.0.0.0:5000 run:app`
 - CORS origin is configurable via environment variables.
 
 ## Submission Notes
 - No Docker is used, as required.
-- Dependencies are intentionally minimal (`flask`, `flask-cors`) for clarity and grading.
+- Dependencies are intentionally minimal (`flask`, `flask-cors`, `gunicorn`) for clarity and grading.

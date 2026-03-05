@@ -20,14 +20,12 @@ def root():
 
 
 @api_bp.get("/health")
-@api_bp.get("/api/health")
 def health():
     # Liveness probe: confirms process is serving HTTP.
     return jsonify({"check": "liveness", "status": "healthy", "timestamp": _utc_now_iso()})
 
 
 @api_bp.get("/ready")
-@api_bp.get("/api/ready")
 def ready():
     # Readiness probe: in AWS this can gate traffic behind an ALB target group.
     db_ready = _simulate_db_check()
@@ -55,7 +53,6 @@ def ready():
 
 
 @api_bp.get("/hello")
-@api_bp.get("/api/hello")
 def hello():
     return jsonify(
         {
@@ -66,7 +63,7 @@ def hello():
     )
 
 
-@api_bp.get("/api/info")
+@api_bp.get("/info")
 def info():
     return jsonify(
         {

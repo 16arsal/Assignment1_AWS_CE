@@ -54,6 +54,7 @@ def ready():
     )
 
 
+@api_bp.get("/hello")
 @api_bp.get("/api/hello")
 def hello():
     return jsonify(

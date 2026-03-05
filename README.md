@@ -4,7 +4,7 @@ This project is a production-style Flask + React application scaffold prepared f
 It is structured for maintainability, health checks, readiness checks, and Gunicorn-based production serving.
 
 ## Tech Stack
-- Backend: Flask, Flask-CORS, Gunicorn
+- Backend: Flask, Flask-CORS, Gunicorn, Requests
 - Frontend: Vite + React
 - Deployment target: AWS EC2 behind ALB (no Docker)
 
@@ -60,6 +60,15 @@ Base URL (local): `http://localhost:5000`
 - `GET /api/info`
   - Environment and service metadata
 
+- `GET /events` and `GET /api/events`
+  - Fetches schedule data from a public Open API (`https://api.tvmaze.com/schedule`)
+  - Transforms it into UniEvent-compatible event objects:
+    - `title`
+    - `date`
+    - `venue`
+    - `description`
+    - `image`
+
 ## Environment Configuration
 ### Backend (`app/backend/.env.example`)
 - `FLASK_ENV=development`
@@ -109,6 +118,29 @@ gunicorn -w 4 -b 0.0.0.0:5000 run:app
   - `gunicorn -w 4 -b 0.0.0.0:5000 run:app`
 - CORS origin is configurable via environment variables.
 
+## External Event API Integration
+- Public API used: `https://api.tvmaze.com/schedule`
+- Why this API was chosen:
+  - Free and public endpoint
+  - No authentication key required
+  - Returns structured JSON suitable for backend transformation
+- Transformation into "University Events":
+  - `title`: from `show.name` (fallback: schedule item name)
+  - `date`: from `airdate` (fallback: `show.premiered`)
+  - `venue`: from `show.network.name` or `show.webChannel.name` (fallbacks applied)
+  - `description`: from `show.summary` after stripping HTML tags
+  - `image`: from `show.image.original` or `show.image.medium`
+- Endpoint availability:
+  - `/events`
+  - `/api/events`
+  These both work because the same Flask blueprint is registered once at root and once with `/api`.
+
+### Example curl Commands
+```bash
+curl http://localhost:5000/api/events
+curl http://<ALB-DNS>/api/events
+```
+
 ## Submission Notes
 - No Docker is used, as required.
-- Dependencies are intentionally minimal (`flask`, `flask-cors`, `gunicorn`) for clarity and grading.
+- Dependencies are intentionally minimal (`flask`, `flask-cors`, `gunicorn`, `requests`) for clarity and grading.
